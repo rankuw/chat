@@ -1,0 +1,8 @@
+.App {
+  min-height: 100vh;
+  background-image: url("./chat-pic.gif");
+  background-size: cover;
+  background-position: center;
+  background-color: black;
+}
+
