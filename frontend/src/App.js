@@ -7,14 +7,12 @@ import { Box, Container, Text } from "@chakra-ui/react";
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
         <Routes>
           <Route path="/">
             <Route index element={<Home />} />
             <Route path="chats" element={<Chats />} />
           </Route>
         </Routes>
-      </BrowserRouter>
     </div>
     
   );
