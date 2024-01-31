@@ -1,143 +1,114 @@
-import { InputGroup, VStack, useToast } from '@chakra-ui/react'
-import { Input, InputRightElement, Button } from '@chakra-ui/react'
-import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    FormHelperText,
-  } from '@chakra-ui/react'
-import React, {useState} from 'react'
+import { FormControl, FormLabel, VStack, Input, InputGroup, InputRightElement, Button } from "@chakra-ui/react";
+import { useState } from "react";
+import { useToast } from '@chakra-ui/react'
 import axios from "axios"
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
 
-export default function SignUp() {
-    const toast = useToast();
-    const navigate = useNavigate();
+const SignUp = () => {
+    const toast = useToast()
+    const navigate = useNavigate()
 
-    const [show, setShow] = useState(false)
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
 
-    const [name, setName] = useState();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
-    const [confirmPassword, setConfirmPassword] = useState();
-    const [pic, setPic] = useState();
-    const [picLoading, setPicLoading] = useState(false)
-
-    const onClickHandler = async () => {
-        try{
-            setPicLoading(true)
-            if (!name || !email | !password | !confirmPassword){
-                toast({
-                    title: "Can't process the request.",
-                    description: "Not all details are filled.",
-                    status: 'warning',
-                    duration: 5000,
-                    isClosable: true
-                })
-                setPicLoading(false)
-                return
-            }
-            if (password !== confirmPassword){
-                toast({
-                    title: "Warning",
-                    description: "Both the passwords should be the same",
-                    status: 'warning',
-                    duration: 5000,
-                    isClosable: true,
-                })
-                setPicLoading(false)
-                return
-            }
-            const {data} = await axios.post("/user/signUp", {name, email, password}, {
-                headers: {
-                "Content-type": "application/json",
-                }
-            })
-            console.log(data)
-            localStorage.setItem("userInfo", JSON.stringify(data))
-            setPicLoading(false)
+    const signUp = async () => {
+        if (!name || !email || !password || !confirmPassword){
             toast({
-                title: "Welcome to the app.",
-                description: "User created successfully.",
-                status: 'success',
-                duration: 5000,
+                title: 'Missing details',
+                description: "Details are missing...",
+                status: 'error',
+                duration: 9000,
                 isClosable: true,
-            })
-            navigate("/chat")
-        }catch(err){
-            console.log(err)
-            toast({
-                title: "Sorry an error occurred",
-                description: "Try agin later",
-                status: 'warning',
-                duration: 5000,
-                isClosable: true,
-            })
+              })
+            return
         }
+        console.log({name, email, password})
+        const {data} = await axios.post("/user/signUp", {
+            name, email, password
+        })
+        localStorage.setItem("userInfo", JSON.stringify(data))
+        toast({
+            title: "Welcome to the app.",
+            description: "User created successfully.",
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+        })
+
+        navigate("/chats")
     }
-    const handleClick = () => {
-        setShow(!show)
+    const togglePassword = () => {
+        setShowPassword(!showPassword)
     }
+
     return (
         <VStack>
-            <FormControl>
-                <FormLabel>Name</FormLabel>
-                <Input
-                    placeholder='Enter your name'
-                    onChange={(e) => setName(e.target.value)}
-                />
+            <FormControl isRequired>
+                <FormLabel color="blackAlpha.900">Name</FormLabel>
+                <Input value={name} placeholder="Enter your name" onChange={
+                    (e) => {
+                        setName(e.target.value)
+                    }
+                }/>
             </FormControl>
-            <FormControl>
-                <FormLabel>Email address</FormLabel>
-                <Input 
-                    type='email'
-                    placeholder='Enter your email'
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+            <FormControl isRequired>
+                <FormLabel color="blackAlpha.900">Email</FormLabel>
+                <Input value={email} placeholder="Enter your email" onChange={
+                    (e) => {
+                        setEmail(e.target.value)
+                    }
+                }/>
             </FormControl>
-            <FormControl>
-                <FormLabel>Password</FormLabel>
-                <InputGroup>
+            <FormControl isRequired>
+                <FormLabel color="blackAlpha.900">Password</FormLabel>
+                <InputGroup size='md'>
                     <Input
                         pr='4.5rem'
-                        type={show ? 'text' : 'password'}
+                        type={showPassword ? 'text' : 'password'}
                         placeholder='Enter password'
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        onChange={
+                            (e) => {
+                                setPassword(e.target.value)
+                            }
+                        }
                     />
                     <InputRightElement width='4.5rem'>
-                        <Button h='1.75rem' size='sm' onClick={handleClick}>
-                        {show ? 'Hide' : 'Show'}
+                        <Button h='1.75rem' size='sm' onClick={togglePassword}>
+                        {showPassword ? 'Hide' : 'Show'}
                         </Button>
                     </InputRightElement>
                 </InputGroup>
             </FormControl>
-            <FormControl>
-                <FormLabel>Confirm Password</FormLabel>
-                <InputGroup>
+            <FormControl isRequired>
+                <FormLabel color="blackAlpha.900">Confirm Password</FormLabel>
+                <InputGroup size='md'>
                     <Input
                         pr='4.5rem'
-                        type={show ? 'text' : 'password'}
+                        type={showPassword ? 'text' : 'password'}
                         placeholder='Enter password'
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        value={confirmPassword}
+                        onChange={
+                            (e) => {
+                                setConfirmPassword(e.target.value)
+                            }
+                        }
                     />
                     <InputRightElement width='4.5rem'>
-                        <Button h='1.75rem' size='sm' onClick={handleClick}>
-                        {show ? 'Hide' : 'Show'}
+                        <Button h='1.75rem' size='sm' onClick={togglePassword}>
+                        {showPassword ? 'Hide' : 'Show'}
                         </Button>
                     </InputRightElement>
                 </InputGroup>
             </FormControl>
-            <FormControl>
-                <FormLabel>Upload your picture</FormLabel>
-                <InputGroup>
-                    <Input
-                        type="file"
-                        p={1.5}
-                        accept='image/*'
-                    />
-                </InputGroup>
-            </FormControl>
-            <Button colorScheme='blue' minW="100%" mt="15px" isLoading={picLoading} onClick={onClickHandler}>SignUp</Button>
+            <Button bg="blue.200" w="100%" onClick={signUp}>
+                Sign Up
+            </Button>
         </VStack>
     )
 }
+
+export default SignUp;

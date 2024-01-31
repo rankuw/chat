@@ -1,40 +1,42 @@
-import React from 'react'
-import { Container, Center, Text, Tabs, TabList, Tab, TabPanels, TabPanel, Box } from '@chakra-ui/react'
-import SignUp from '../components/authentication/signUp'
-import LogIn from '../components/authentication/logIn'
-import ChatProvider from '../context/chatProvider'
-import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Container, Center, Box, Tabs, TabList, Tab, TabPanels, TabPanel, Heading } from "@chakra-ui/react"
+import Login from "../components/authentication/logIn"
+import SignUp from "../components/authentication/signUp"
+import { useEffect } from "react"
+import { ChatState } from "../context/chatProvider"
+import { useNavigate } from "react-router-dom"
 
-export default function Home() {
-  const navigate = useNavigate()
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userInfo"));
-    if (user) {
-      navigate("/chats");
-    }
-  }, [navigate]);
-  return (
-    <Container maxW="xl"  centerContent>
-      <Center  p={3} bg="white" w="100%" m="40px 0 15px 0" borderRadius="lg" borderWidth="1px">
-        <Text fontSize="4xl"> UChat </Text>
-      </Center>
-      <Box p={4} bg="white" w="100%" m="40px 0 15px 0" borderRadius="lg" borderWidth="1px">
-        <Tabs variant='soft-rounded' colorScheme='blue'>
-          <TabList mb="1em">
-            <Tab w="50%">Sign Up</Tab>
-            <Tab w="50%">Log In</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <SignUp/>
-            </TabPanel>
-            <TabPanel>
-              <LogIn/>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
-    </Container>
-  )
+const Home = () => {
+  console.log("HOMEEEEEE")
+    const {setUser} = ChatState()
+    const navigate = useNavigate()
+    useEffect(() => {
+      const userInfo = localStorage.getItem("userInfo")
+      if (userInfo) navigate("/chats")
+      setUser(JSON.parse(userInfo))
+    }, [])
+    return (
+        <Container maxW="2xl">
+          <Center p={3} bg="white" margin="40px 0 15px 0" borderWidth="1px" w="100%" borderRadius="lg">
+            <Heading>UChat</Heading>
+          </Center>
+          <Box w="100%" borderWidth="1px" borderColor="black.100" borderRadius="lg" p="16px" margin="30px 0px">
+            <Tabs variant='soft-rounded'>
+            <TabList>
+              <Tab width="50%">LogIn</Tab>
+              <Tab width="50%">SignIn</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <Login/>
+              </TabPanel>
+              <TabPanel>
+                <SignUp/>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+          </Box>
+        </Container>
+    )
 }
+
+export default Home;

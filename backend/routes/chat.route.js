@@ -1,14 +1,13 @@
-const express = require("express");
+const { Router } = require("express")
+const chatRouter = Router()
+const { accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup } = require("../controller/chat.controller")
+const auth  = require("../middleware/auth")
 
-const chatRoute = express.Router();
-const { accessChat, fetchChats, createGroupChats, renameGroup, removeFromGroup, addToGroup } = require("../controller/chat.controller");
-const auth = require("../middleware/authMiddleware")
+chatRouter.post("/access", auth, accessChat)
+chatRouter.get("/", auth, fetchChats)
+chatRouter.post("/group", auth, createGroupChat)
+chatRouter.patch("/update", auth, renameGroup)
+chatRouter.patch("/group/add", auth, addToGroup)
+chatRouter.patch("/group/remove", auth, removeFromGroup)
 
-// return the chat between two people or create a new one if not present from before.
-chatRoute.post("/", auth, accessChat)
-chatRoute.get("/", auth, fetchChats)
-chatRoute.post("/group", auth, createGroupChats)
-chatRoute.patch("/group", auth, renameGroup)
-chatRoute.patch("/group/remove", auth, removeFromGroup)
-chatRoute.patch("/group/add", auth, addToGroup)
-module.exports = chatRoute
+module.exports = chatRouter;

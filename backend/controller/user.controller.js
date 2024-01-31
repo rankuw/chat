@@ -1,70 +1,33 @@
-const User = require("../models/User.model")
-const generateToken = require("../utils/token")
-const asyncHandler = require("express-async-handler")
+const User = require("../models/user.model")
 
-const signUp = asyncHandler(
-    async (req, res) => {
-        const {name, email, password } = req.body;
-        if(!name || !email || !password){
-            throw new Error("Not all values are passed")
-        }
-        let user = await User.findOne({email});
-        if(user){
-            throw new Error("User exists from before")
-        }
-        user = await User.create({name, email, password})
-        res.send({
-            name,
-            email,
-            token : generateToken(user._id)
-        })
+const signUp = async (payload) => {
+    try{
+        const user = await User.create(payload)
+        return {name: user.name, id: user.id}
+    }catch(err){
+        console.log(err)
+        return err
     }
-)
+}
 
-const logIn = asyncHandler(
-    async (req, res) => {
-        const {email, password} = req.body;
-        if(!email || !password){
-            throw new Error("Not all values passed")
-        }
-        const user = await User.findOne({email});
+const logIn = async (payload) => {
+    try{
+        const user = await User.findOne(payload).lean()
         console.log(user)
-        if(!user){
-            throw new Error("User does not exists")
-        }
-        console.log(user.password, password)
-        if(user.password != password){
-            throw new Error("Incorrect password")
-        }
-        res.send({
-            name: user.name,
-            email: user.email,
-            token: generateToken(user._id)
-        })
+        console.log("++++++++++")
+        return user
+    }catch(err){
+        console.log(err)
+        return err
     }
-)
+}
 
-const fetchUsers = asyncHandler(
-    async (req, res) => {
-        try{
-            const keyword = req.query.search
-            const user = req.user
-            console.log(user)
-            const criteria = {_id: {$ne: user.id}}
-            if(keyword){
-                criteria["$or"] = {
-                    $or: [
-                        {name: {$regex: keyword, $options: "i"}}
-                    ]
-                }
-            }
-            const projection = {password: 0}
-            const users = await User.find(criteria, projection, {lean: true})
-            res.send(users)
-        }catch(err){
-            console.log(err)
-            throw new Error(err.message)
-        }
-    }
-)
-module.exports = {signUp, logIn, fetchUsers}
+const getUsers = async (req, res) => {
+    const {name} = req.query;
+    const users = await User.find({
+        name: {$regex: name, $options: "i"}
+    })
+    res.send(users)
+}
+
+module.exports = {signUp, logIn, getUsers}

@@ -1,20 +1,17 @@
 const express = require("express")
-const data = require("./data")
+const cors = require('cors')
+
 const app = express()
-const connectDb = require("./database/connection")
 const userRoute = require("./routes/user.route")
-const chatRoute = require("./routes/chat.route")
-const errorHandler = require("./middleware/errorHandler")
-const notFound = require("./middleware/notFound")
-connectDb();
+const mongoConnection = require("./database/connection")
+const chatRouter = require("./routes/chat.route")
 
+mongoConnection()
+app.use(cors())
 app.use(express.json())
-app.use("/user", userRoute);
-app.use("/chat", chatRoute)
-
-app.use(notFound)
-app.use(errorHandler);
+app.use("/user", userRoute)
+app.use("/chat", chatRouter)
 
 app.listen(4000, () => {
-    console.log("Server is listening on ", 4000)
+    console.log("server on 4000")
 })
