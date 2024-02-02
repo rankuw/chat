@@ -9,7 +9,7 @@ const messageSchema = Schema({
     content: {
         type: "string"
     },
-    chat: {
+    chatId: {
         type: Schema.Types.ObjectId,
         ref: "Chat"
     }

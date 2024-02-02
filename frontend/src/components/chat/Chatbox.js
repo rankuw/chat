@@ -23,3 +23,15 @@
 // };
 
 // export default Chatbox;
+
+import { Box } from "@chakra-ui/layout";
+const ChatBox = () => {
+    return <Box
+        bg="blue"
+        w="69%"
+    >
+        Chat Box
+    </Box>
+}
+
+export default ChatBox;

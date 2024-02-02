@@ -59,7 +59,7 @@ const ChatProvider = ({children}) => {
         navigate("/chats")
     }, [])
 
-    return <ChatContext.Provider value={{user, setUser}}>
+    return <ChatContext.Provider value={{user, setUser, chats, setChats, currentChat, setCurrentChat}}>
         {children}
     </ChatContext.Provider>
 }

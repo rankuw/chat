@@ -130,9 +130,84 @@
 
 // export default MyChats;
 
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
+import ChatLoading from "./ChatLoading";
+import { ChatState } from "../../context/chatProvider";
+import { useEffect } from "react";
+import axios from "axios";
+import { getSenderName } from "../../utils/helper";
+import GroupChatModal from "./GroupChatModal";
 
 const MyChats = () => {
-    return <h1>My Chats</h1>
+    const { chats, setChats, currentChat, setCurrentChat, user } = ChatState()
+
+    const fetchChats = async () => {
+        const {data} = await axios.get("/chat", {headers: {authorization: "Bearer " + user.token}})
+        setChats(data)
+    }
+
+    useEffect(() => {
+        fetchChats()
+    }, [])
+
+    return (
+        <Box
+            w="30%"
+            h="100%"
+            bg="blue.100"
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+            p={3}
+            borderRadius="lg"
+            borderWidth="1px"
+        >
+            <Box
+                pb={3}
+                px={3}
+                fontSize="30px"
+                display="flex"
+                w="100%"
+                justifyContent="space-between"
+                alignItems="center"
+            >
+                <Text>My Chats</Text>
+                <GroupChatModal>
+                    <Button rightIcon={<AddIcon />}>New Group Chat</Button>
+                </GroupChatModal>
+                
+            </Box>
+            <Box
+                display="flex"
+                flexDirection="column"
+                p={3}
+                bg="#F8F8F8"
+                w="100%"
+                h="100%"
+            >   
+                <Stack>
+                    {chats.map((chat) => {
+                        return(
+                            <Box 
+                                display="flex" 
+                                p={4}  
+                                bg={chat._id == currentChat ? "blue" : "orange"}
+                                flexDirection="column" 
+                                onClick={() => setCurrentChat(chat._id)}
+
+                            >
+                                <Text>
+                                    {chat.isGroupChat ? chat.chatName : getSenderName(chat.users, user)}
+                                </Text>
+                            </Box>
+                        )
+                    })}
+                </Stack>
+            </Box>
+            
+        </Box>
+    )
 }
 
 export default MyChats;

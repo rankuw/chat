@@ -45,7 +45,7 @@ import { Box, Text } from "@chakra-ui/layout";
 const UserList = ({user, func}) => {
 
     return (
-        <Box display="flex" alignItems="center" p="3px 2px" w="100%" bg="#E8E8E8" mt="6px" borderRadius="lg" cursor="pointer" padding="2px 3px" _hover={{bg:"blue", color: "white"}} onClick={func(user._id)}>
+        <Box display="flex" alignItems="center" p="3px 2px" w="100%" bg="#E8E8E8" mt="6px" borderRadius="lg" cursor="pointer" padding="2px 3px" onClick={func} _hover={{bg:"blue", color: "white"}}>
             <Avatar 
                 name={user.name}
                 mr="4px"

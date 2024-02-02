@@ -23,24 +23,18 @@ import { Box } from "@chakra-ui/react"
 import SideDrawer from "../components/chat/SideDrawer"
 import MyChats from "../components/chat/MyChat"
 import ChatBox from "../components/chat/Chatbox"
+
 const Chat = () => {
     const {user} = ChatState()
     return (
         <Box>
-            {user ? 
-                <>
-                    <SideDrawer /> 
-                    <Box
-                        display="flex"
-                        width="100%"
-                        justifyContent="space-between"
-                        p="10px"
-                    > 
-                        <MyChats/> 
-                        <ChatBox /> 
-                    </Box> 
-                </>: 
-                <h1>Oops</h1>}
+            {user && <SideDrawer />}
+            <Box display="flex" justifyContent="space-between" w="100%" h="91.5vh" p="10px" >
+                {user && <MyChats/>}
+                {user && (
+                    <ChatBox />
+                )}
+            </Box>
         </Box>
     )
 }

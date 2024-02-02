@@ -190,3 +190,101 @@
 //         </>
 //       );
 // }
+
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, useToast } from "@chakra-ui/react";
+import { Input } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import { useState } from "react";
+import axios from "axios";
+import UserList from "../user/UserList";
+import UserBadgeItem from "../user/UserBadgeItem";
+import { ChatState } from "../../context/chatProvider";
+
+const GroupChatModal = ({children}) => {
+    const { setChats, chats, user } = ChatState()
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const [ groupName, setGroupName ] = useState()
+    const [ userQuery, setUserQuery ] = useState()
+    const [ searchResult, setSearchResult ] = useState([])
+    const [ selectedUsers, setSelectedUsers ] = useState([])
+    const toast = useToast()
+    const searchUser = async () => {
+        const {data} = await axios.get("/user?name=" + userQuery)
+        setSearchResult(data)
+    }
+
+    const selectUser = (user) => {
+        if (selectedUsers.filter((u) => {return u._id == user._id}).length >= 1){
+            toast({
+                title: 'User already selected',
+                description: "Same user not allowed",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+              })
+              return;
+        }
+        setSelectedUsers([...selectedUsers, user])
+        setSearchResult(searchResult.filter(u => {return user._id != u._id}))
+    }
+
+    const handleClose = (user) => {
+        setSelectedUsers(selectedUsers.filter(u => {return u._id != user._id}))
+    }
+
+    const createGroup = async () => {
+        if(!groupName || selectedUsers.length <= 2){
+            toast({
+                title: 'Can not create group',
+                description: "Not allowed",
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+              })
+              return
+        }
+        const { data } = await axios.post("/chat/group", {chatName: groupName, users: selectedUsers}, {headers: {Authorization: "Bearer " + user.token}})
+        setChats([data, ...chats])
+        setGroupName("")
+        setSelectedUsers([])
+        onClose()
+    }
+
+    return(
+        <>
+            <span onClick={onOpen}>{children}</span>
+
+            <Modal isOpen={isOpen} onClose={onClose} isCentered="true" size="lg">
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader fontSize="40px">Create Group Chat</ModalHeader>
+                    <ModalBody>
+                        <Input placeholder="Enter Chat Name" my="6px" value={groupName} onChange={(e) => {setGroupName(e.target.value)}}></Input>
+                        <Input placeholder="Enter User to add" my="6px" value={userQuery} onChange={
+                            (e) => {
+                                setUserQuery(e.target.value)
+                                searchUser(e.target.value)
+                            }
+                        }></Input>
+                        {
+                            selectedUsers.map((user) => {
+                                return <UserBadgeItem user={user} func={() => handleClose(user)}/>
+                            })
+                        }
+                        {
+                            searchResult.slice(0, 4).map((user) => {
+                                return <UserList user={user} func={() => selectUser(user)}></UserList>
+                            })
+                        }
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button bg="blue.400" onClick={createGroup}>Create Group</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </>
+        
+    )
+}
+
+export default GroupChatModal;

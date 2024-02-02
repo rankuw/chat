@@ -36,11 +36,13 @@ const fetchChats = async(req, res) => {
     const user = req.user;
     const chats = await Chat.find({
         users: {$elemMatch: {$eq: user}}
-    })
+    }).populate("users")
     res.send(chats)
 }
 
 const createGroupChat = async (req, res) => {
+    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+    console.log(req.body)
     const {users, chatName} = req.body
     const user = req.user
 

@@ -165,7 +165,7 @@ import ChatLoading from "./ChatLoading";
 import UserList from "../user/UserList";
 
 const SideDrawer = () => {
-    const {user} = ChatState()
+    const {user, chats, setChats, currentChat, setCurrentChat} = ChatState()
     const navigate = useNavigate()
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -189,6 +189,7 @@ const SideDrawer = () => {
                 isClosable: true,
                 position: "top-left"
             })
+            return
         }
         setSearchLoading(true)
         const {data} = await axios.get("/user?name=" + searchUser)
@@ -199,8 +200,11 @@ const SideDrawer = () => {
     const accessChat = async (userId) => {
         console.log("access chatttt", userId)
         const {data} = await axios.post("/chat/access", {user: userId}, {headers: {Authorization: "Bearer " + user.token}})
-        console.log(data)
+        setCurrentChat(data._id)
+        setChats([...chats, data])
+        onClose()
     }
+
     return(
         <>
             <Box
@@ -263,7 +267,7 @@ const SideDrawer = () => {
                         <Box>
                             {searchLoading ? <ChatLoading/> : userList.map((user) => {
                                 console.log(user)
-                                return <UserList user={user} func={accessChat}/>
+                                return <UserList user={user} func={() => accessChat(user._id)}/>
                             })}
                         </Box>
                     </DrawerBody>
