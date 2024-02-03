@@ -41,20 +41,16 @@ import { useNavigate } from "react-router-dom"
 const ChatContext = createContext()
 
 const ChatProvider = ({children}) => {
-    console.log("CHAT provider")
     const [user, setUser] = useState("")
     const [chats, setChats] = useState([])
-    const [currentChat, setCurrentChat] = useState()
+    const [currentChat, setCurrentChat] = useState({})
     const navigate = useNavigate()
     useEffect(() => {
-        console.log("Use effect")
         const userInfo = localStorage.getItem("userInfo")
-        console.log(userInfo)
         if (!userInfo) {
             navigate("/")
             return
         }
-        console.log("WTFFFFFFFF")
         setUser(JSON.parse(userInfo))
         navigate("/chats")
     }, [])

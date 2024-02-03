@@ -6,7 +6,6 @@ import { ChatState } from "../context/chatProvider"
 import { useNavigate } from "react-router-dom"
 
 const Home = () => {
-  console.log("HOMEEEEEE")
     const {setUser} = ChatState()
     const navigate = useNavigate()
     useEffect(() => {

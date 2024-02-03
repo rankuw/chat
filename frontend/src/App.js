@@ -6,7 +6,6 @@ import ChatProvider from './context/chatProvider';
 
 
 function App() {
-  console.log("APPPP")
   return (
     <ChatProvider>
       <Outlet/>

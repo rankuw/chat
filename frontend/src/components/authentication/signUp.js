@@ -25,7 +25,6 @@ const SignUp = () => {
               })
             return
         }
-        console.log({name, email, password})
         const {data} = await axios.post("/user/signUp", {
             name, email, password
         })

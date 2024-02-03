@@ -198,9 +198,8 @@ const SideDrawer = () => {
     }
 
     const accessChat = async (userId) => {
-        console.log("access chatttt", userId)
         const {data} = await axios.post("/chat/access", {user: userId}, {headers: {Authorization: "Bearer " + user.token}})
-        setCurrentChat(data._id)
+        setCurrentChat(data)
         setChats([...chats, data])
         onClose()
     }
@@ -266,7 +265,6 @@ const SideDrawer = () => {
                         </InputGroup>
                         <Box>
                             {searchLoading ? <ChatLoading/> : userList.map((user) => {
-                                console.log(user)
                                 return <UserList user={user} func={() => accessChat(user._id)}/>
                             })}
                         </Box>

@@ -4,7 +4,11 @@ const User = require("../models/user.model")
 
 const getAllMessages = async (req, res) => {
     try{
+        console.log(req.params)
         const messages = await Message.find({chatId: req.params.chatId}).populate("sender").populate("chatId")
+
+        await User.populate(messages, {path: "chatId.users"})
+
         res.send(messages)
 
     }catch(err){
@@ -14,6 +18,7 @@ const getAllMessages = async (req, res) => {
 } 
 
 const sendMessage = async (req, res) => {
+    console.log(req.body)
     try{
         const dataToSave = {
             chatId : req.body.chatId,

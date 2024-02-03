@@ -192,9 +192,9 @@ const MyChats = () => {
                             <Box 
                                 display="flex" 
                                 p={4}  
-                                bg={chat._id == currentChat ? "blue" : "orange"}
+                                bg={chat._id == currentChat._id ? "blue" : "orange"}
                                 flexDirection="column" 
-                                onClick={() => setCurrentChat(chat._id)}
+                                onClick={() => setCurrentChat(chat)}
 
                             >
                                 <Text>
