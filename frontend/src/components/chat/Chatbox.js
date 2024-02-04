@@ -6,17 +6,48 @@ import { Input } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SingleChat from "../chat/SingleChat"
+import io from "socket.io-client"
 
+var socket, selectedChatCompare
 const ChatBox = () => {
     const { currentChat, user } = ChatState()
     const [ messages, setMessages ] = useState([])
     const [ newMessage, setNewMessage ] = useState()
+    const [ socketConnected, setSocketConnected ] = useState(false)
+    const [ typing, setTyping ] = useState(false)
+
+    useEffect(() => {
+        socket = io("http://localhost:4000")
+        socket.emit("setup", user)
+        socket.on("connected", () => {setSocketConnected(true)})
+        socket.on("typing", () => {setTyping(true); console.log("START TYPINDGGGG")})
+        socket.on("stop typing", () => setTyping(false))
+
+    }, [])
+
+    useEffect(() => {
+        if(currentChat._id){
+            fetchMessages()
+        }
+        selectedChatCompare = currentChat
+    }, [currentChat])
+
+    useEffect(() => {
+        socket.on("message received", (newMessage) => {
+            console.log("MESAGEEEEEEEEEEE", newMessage)
+           
+                setMessages([...messages, newMessage])
+            
+        })
+    })
     const sendMessage = async (e) => {
         if (e.key == "Enter" && newMessage){
             try{
                 const { data } = await axios.post("/message/", {content: newMessage, chatId: currentChat._id}, {headers: {Authorization: "Bearer " + user.token}})
                 setMessages([...messages, data])
                 setNewMessage("")
+                socket.emit("stop typing", currentChat._id)
+                socket.emit('new message', data)
             }catch(err){
                 console.log(err)
                 return
@@ -26,22 +57,25 @@ const ChatBox = () => {
     }
     const typingHandler = (e) => {
         setNewMessage(e.target.value)
+
+        if(socketConnected){
+            socket.emit("typing", currentChat._id)
+
+            setTimeout(() => {
+                setTyping(false)
+            }, 3000)
+        }
     }
 
     const fetchMessages = async () => {
         try{
             const { data } = await axios.get("/message/" + currentChat._id, {headers: {Authorization: "Bearer " + user.token}})
             setMessages(data)
+            socket.emit("join chat", currentChat._id)
         }catch(err){
             console.log("err", err)
         }
     }
-
-    useEffect(() => {
-        if(currentChat._id){
-            fetchMessages()
-        }
-    }, [currentChat])
     
 
     return <Box
@@ -58,7 +92,9 @@ const ChatBox = () => {
                 <SingleChat messages={messages} />    
             }
         </Box>
-
+        {
+            typing ? <div>Typing</div> : <></>
+        }
         <FormControl onKeyDown={sendMessage} isRequired>
              <Input onChange={typingHandler} placeholder="Enter your message" value={newMessage}>
 
